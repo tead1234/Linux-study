@@ -1,0 +1,153 @@
+5월 30일 
+
+* 권한 설정
+- 읽기(r) = 4,   쓰기(w)=2,  실행(x)=1,  권한없음(-)=0
+- 764 = Owner(rwx) ,  Group(rw-),  Other(r--)
+- chmod  700  [파일명]    -----> 권한이 변경됨
+- chown  twice.girlgroup  [파일명]     -----> Owner와 Group이 변경됨
+- setuid : 일반사용자가 일시적으로 root권한을 이용해서 명령을 실행하는 것 : -rwsr--r--
+- setgid : 일반사용자가 일시적으로 그룹권한을 이용해서 명령을 실행하는 것 : -rwxrwsrwx
+- stickybit : 공유 디렉토리(파일을 업로드할 수 있지만, 다른 사용자의 파일을 삭제/수정 불가)
+       -----> drwxrwxrwt
+
+* 압축하고 압축해제하기
+- xz, gzip, bzip2  (압축풀때는 -d : decompress)
+- zip은 압축할 때,  unzip은 압축을 해제할 때 ----> Windows와 호환 가능, 여러파일 압축 가능
+
+실습) rkhunter 다운로드
+- rkhunter는 rootkit을 잡아(hunter)주는 도구
+# wget http://172.20.30.142/data/rkhunter-1.4.6.tar.gz
+
+안되는 사람은 Firefox를 켜고 구글에 접속합니다.
+구글에서 'rkhunter download'를 검색합니다.
+Sourceforge.net에 접속해서 'Download' 버튼 클릭해서 Save File을 클릭하면 저장됨
+cd  /home/cc/Downloads
+ls -l 
+----->   rkhunter-1.4.6.tar.gz 파일이 있는 지 확인
+tar  -zxvf  rk<tab>
+cd  rk<tab>
+./installer.sh  --install
+rkhunter  -c
+----> 실행시 읽지도 못하는 글이 막올라오는데 그냥 오케이 
+
+
+cf. Rootkit이란?  공격자가 root권한을 확보하기 위해서 사용하는 해킹 툴. 
+    (성공하면 공격자는 root권한을 획득하게 됨)
+
+
+# find /usr/bin -size +100k -size -1000k | sort | sort -rn              // sort : 정렬,  -rn : 내림차순
+-----> sort를 먼저 표시하여 sort 명령을 할 것이란 걸 미리 알려줌 |은 파이트 필터
+* 오름차순 : -n       ex) abcd...  ,  123456... 등
+  내림차순 : -rn (r : reverse)     ex) zyxw...,   98765.... 등
+
+
+# touch test.swp
+# find  .  -size 0k  -exec ls -l  {} \;
+-rw-r--r--. 1 root root 0 May 30 10:20 ./test.swp
+
+# find /  -name "*.swp" -exec rm {} \;                    // find의 결과가 {}안에 들어감
+
+* MAC Time ----> 누가 어떤 파일에 접근/수정/생성을 했는지 파악
+-mtime :  modify time(수정 시간)
+-atime  :  access time(접근 시간) ----> cat, less, vi 등으로 접근했을 때
+-ctime :   create time(생성 시간)
+
+ex) 생성한지 3일 이내의 파일을 찾아보기
+# find  /  -ctime  -3
+
+ex) 수정한지 100일이 넘은 파일을 찾아보기
+# find  /  -mtime  +100
+
+실습) 자신의 생일 오전 9시에 congratulation이 동작하려면?   (5/30일)
+    00  09  30  05  *   cc    congratulation
+
+실습) 싼타할아버지(santa)가 크리스마스(12/25일 0시)에 'gift'를 주게 하려면?
+    00  00  25  12  *   santa  give a gift
+
+p.233~238 까지 cron, at 설정에 대해 읽어봅니다.
+
+* DNS
+- 정방향 조회 : 도메인 이름을 입력하면 IPv4/IPv6 주소를 알려주는 것 : A,  A6,  AAAA
+- 역방향 조회 : IPv4/IPv6주소를 입력하면 도메인 이름을 알려주는 것 : ptr  (pointer)
+
+* IPv4
+- 8bit씩 4자리로 구성되어 있음 ----> 32bit주소체계 (=4 Octet = 4bytes)
+- 각 자리는 . (dot)으로 구분하고 있음
+- 8bit = 1byte = Octet                               8을 라틴어로 Oct   ex) Octopus, Octave
+- 네트워크 부분(성)과 호스트 부분(이름)으로 나뉘어짐
+- 구분하는 방법
+1) Classful : 클래스 기반 ----> 클래스에 따라 네트워크 부분이 결정됨 (~1992년까지만 사용함)
+               (N:Network ---> 주어짐,  H:Host ----> 자유롭게 활용)
+    Class A : N.H.H.H      ( Host에 할당할 수 있는 크기 : 24bit ---> 2의 24승 = 1677만개)
+    Class B : N.N.H.H      ( Host에 할당할 수 있는 크기 : 16bit ---> 2의 16승 = 65,536개)
+    Class C : N.N.N.H      ( Host에 할당할 수 있는 크기 : 8bit  ----> 2의 8승 = 256개)
+    Class D : Multicast  
+    Class E : Not Used (용도 비공개)
+
+2) Classless : 클래스를 무시  -----> Subnet Mask를 사용
+    IP주소와 Subnet Mask를 짝을 지워서 사용
+    Subnet Mask의 이진수로 1에 해당하는 부분은 Network, 이진수로 0에 해당하는 부분은 Host
+        IPv4 주소 . . . . . . . . . : 172.20.30.142
+      서브넷 마스크 . . . . . . . : 255.255.255.0      ( 255 = 1111 1111 ----> 모든 비트가 1)
+
+
+p.238~248 내용을 읽어봅니다.
+
+# nmtui                            // 화살표키를 이용해서 IP주소를 변경할 수 있음
+   manual  :     IPv4: 192.168.5.100,  GW: 192.168.5.2,  DNS : 168.126.63.1
+# ifconfig     
+    (아직은 192.168.5.128)
+# ifdown   ens160                           // 변경한 후에는 인터페이스를 껐다가 켜야 반영됨
+# ifup    ens160
+# ifconfig 
+    (IP주소가 192.168.5.100으로 변경됨)
+
+* Ping : 명령어
+----> ICMP프로토콜의 Echo Request를 보내고, Echo Reply가 되돌아 오게 됨
+- 응답이 없으면 호스트가 다운되었거나, 중간이 막혀있기 때문(방화벽 등)
+  1단계) VM GW까지 ping해보기    ping 192.168.5.2
+  2단계) 강의장 GW까지 ping해보기    ping 172.20.30.253
+  3단계) 우리나라 DNS root mirror Server    ping 168.126.63.1
+  4단계) 미국의 Google Server      ping 8.8.8.8
+
+* traceroute : 경로를 확인하는 명령
+- 리눅스 : traceroute     
+# dnf  install  traceroute  -y
+# traceroute  google.com
+
+- 윈도우 : tracert
+cmd> tracert  google.com
+cmd> tracert  br.yahoo.com
+
+예제) 4시 정각에 /home/twice/santa.txt 파일을 만들고 그 안에 Merry Christmas라고 입력되도록 설정 해보기
+# at 16:00  2023-05-30
+at> echo "Merry Christmas">/home/twice/santa.txt
+at> <EOT>
+# ls -l  /home/twice
+    ( 4시전이라 없음... )
+
+* 시간이 안맞으면,  p.231 시간 설정 참고
+
+* IP주소 변경하기
+#  cd /etc/sysconfig/network-scripts/
+#  ls
+#  vi ifcfg-ens160 
+     (IP주소 변경)
+#  ifdown ens160
+#  ifup ens160
+#  ifconfig
+
+실습) youtube.com  접속을 못하도록 127.0.0.1로 설정하세요~
+# vi  /etc/hosts
+  i
+127.0.0.1<tab>www.youtube.com
+  ESC
+  :wq
+
+* ICMP 시스템 설정 내용을 정렬해서 따로 저장하기
+# sysctl -a | grep icmp | sort | sort -n  >  /home/cc/config.txt
+# cat /home/cc/config.txt
+
+
+
+
