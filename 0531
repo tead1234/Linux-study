@@ -1,0 +1,131 @@
+5월 31일 
+
+* 클라우드
+- 리눅스, 데이터베이스, 프로그래밍을 AWS, MS-Azure, GCP에서 실행하는 것
+
+* 리눅스
+- 배포판 종류가 많음 ----> 명령어가 조금씩 다름 (기본 명령어는 같지만, 일부 없거나 다르기도 함)
+- 같은 배포판이어도 없는 명령어, 달라진 라이브러리 등등 ----> 의존성(Dependancy) 
+- 리눅스 오픈 소스이므로 많은 개발자들의 재능 기부로 만들어짐 ---> 복잡...
+- rpm패키지가 편리했지만 의존성 문제(설치불가)로 yum, dnf 등의 자동설치 기능이 제공됨
+
+* 의존성
+- OS를 제공하는 조직은 거대조직 ----> 업데이트 빠름 (새로운 기능을 넣고 예전 기능을 빼버림)
+- Application을 제공하는 조직은 소규모 ----> 업데이트 느림(거의 안됨) ---> 설치가 잘안되기도 함
+
+* 파일 찾기 : find
+- 일반사용자 권한으로는 사용할 수 없음 
+- root권한을 이용해야 함  (파일들 중에 권한이 일반사용자는 읽기 권한도 없는 경우가 많기 때문)
+1) 이름을 찾기
+# find  /  -name  "*passwd*"               // 전체디렉토리(/)에서 twice가 중간에 들어가는 모든 파일검색
+# find  /  -name  "passwd"                      // 전체디렉토리(/)에서 twice라고 되어있는 파일만 검색
+
+2) 권한으로 찾기
+# find  /  -perm  600
+# find  /  -perm  007                         // 오너도 읽을 수 없는데, 일반사용자만 읽기,쓰기,실행 가능
+
+3) MAC타임으로 찾기
+# find  /  -ctime   -10                        // 생성시간(creation time)이 10일 이내인 파일을 검색
+# find  /  -mtime  -3                          // 수정시간(modify time)이 3일 이내인 파일을 검색
+# find  /  -atime  +100                       // 접근시간(access time)이 100일이 넘은 파일을 검색
+
+cf. 개수를 확인하고 싶으면  | 뒤에 wc -l 을 사용 
+    #  find  /  -atime  +100  |  wc -l
+
+4) find한 결과를 어떻게 처리할까?
+# find  /home  -name "*.txt"  -exec rm { }  \;
+# find  /home  -size  +100k   -size  -1000000k  
+
+cf. 서양에서는 000단위로 단위가 달라짐,  000=k,   000,000=M,  000,000,000=G,  000,000,000,000=T
+    동양에서는 0000단위로 단위가 달라짐,  0000=만,  0000,0000=억,  0000,0000,0000=조
+
+   1000,0000,0000,0000원 = 1000조 
+   1,000,000,000,000,000원 
+
+* AWK(오크;Aho Weinberger Kernighan)
+
+# echo Mina Sana Momo Dahyun | awk '{print $4,$3,$1,$2}'
+ ---->  Dahyun Momo Mina Sana
+
+# tail -10 /var/log/secure  |  awk '{print $5,$6}'
+
+# cat   /var/log/secure | awk '{print $1,$2}' | sort | uniq -c
+
+* | (파이프) 앞은 조건, | (파이프) 뒤는 실행하게 됨 ---> | 가 여러개 이므로 상대적으로 적용되고 반복
+* uniq -c 는 중복을 제거하고, 중복된 개수를 왼쪽에 표시함
+* sort는 정렬을 한다는 의미
+* awk는 컬럼 단위로 골라서 보기
+
+uniq  -c  중복을 제거하고 왼쪽에 개수를 표시
+sort  -u  중복만 제거
+
+# lastlog                             // 사용자들의 마지막 로그인 시간, 접속한적이 없으면 never logged in
+
+p.254~262 까지 읽고 정리하기
+
+실습) sed문 사용하기
+# cat /var/log/secure  |  awk '{print $1}'  |  sed 's/May/Santa/g'  |  sort  |  uniq -c  
+
+
+* root 패스워드 변경하기
+init=/bin/sh                  // 초기에 로그인보다 쉘부터 띄우라는 의미
+----> / 루트 디렉토리가 읽기 상태임 ----> mount를 이용해서 rw로 변경 ---> 비밀번호 변경 --> 재부팅
+
+* 암호화 안되는 프로토콜 : Telnet, FTP, http(80), SMTP, POP, IMAP, rlogin  ----> Sniffing (데이터 도청)
+
+* 암호화가 지원되는 프로토콜 : SSH (Secure Shell),  https(443),  VPN 등등 ----> 권장
+
+* MySQL
+- Oracle에서 인수, Sun Microsystems를 인수 ---> Java가 오라클 소유(?)
+- MariaDB를 만들었는데, 명령어 및 기능이 98%는 비슷 (약간 개선)
+- Ubuntu에서는 MySQL,  CentOS, Amazon Linux에서는 Mariadb를 사용
+
+* APM
+- Linux용 Apache2 + PHP + MySQL(MariaDB)  ----> LAMP라고도 함
+- 웹서버를 만드는 패키지
+
+* Server와 Client는 컴퓨터가 아님, 사람도 아님  -----> 프로세스
+- Web Client(Chrome, Edge) -----> Web Server(Apache2, IIS, Nginx)
+
+# cd  /var/www/html
+# wget http://172.20.40.62/data/vw.jpg
+# vi  index.html
+   <img src=vw.jpg>
+   :wq
+
+* 웹서버가 동작하지 않으면???
+1) Apache가 동작하는가?    
+# systemctl  status  httpd        ------> inactive로 나오면?
+# systemctl  restart  httpd
+2) Firefox에서는 되는데 외부의 Windows에 있는 Edge에서는 접속이 안되면?
+# firewall-config
+   Permanent로 하고, http와 https에 체크하고 Options >  Reload Firewalld 하면 됨
+또는 터미널에서 직접 입력하기
+# firewall-cmd  --permanent  --add-service=http
+# firewall-cmd  --permanent  --add-service=https
+# firewall-cmd  --reload                                             // 리로드를 해야 적용됨
+
+3) index.html 파일이 웹서버 루트 디렉토리에 있는지?
+# ls -l  /var/www/html
+
+* 워드 프레스 설치하기 오류 해결방법
+1) DB연결이 안되면 
+# vi  wp-config.php
+    -----> wpDB, wpUser, 1234
+
+2) 아파치 재시작이 안될때
+# systemctl  restart  httpd
+# vi /etc/httpd/conf/httpd.conf
+     34번   /etc/httpd
+    122번 등 수정  ---->  p.637 내용을 참고해서 수정
+
+* 관리자 페이지
+http://192.168.5.98/wp-admin/   ----> ID/PW를 입력해야 들어가짐
+
+* 일반사용자
+http://192.168.5.98
+
+
+
+
+
