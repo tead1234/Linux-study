@@ -1,0 +1,33 @@
+우분투 22.04.0를 활용한 그누보드 설치하기
+
+sudo  apt  update    
+   (PW : ubuntu )
+   소프트웨어 업데이트 창이 뜨면 '나중에 알림'을 선택   ----> 제대로 동작 안할 수 있음
+$ sudo  apt  install  vim
+
+1) 웹서버 설치
+$ sudo  apt  install  apache2                     //  y입력후 엔터
+
+2) Database 설치 (MySQL 설치)
+$ sudo  apt  install  mysql-server
+$ sudo  mysql  -u root  -p                             // MySQL에 접속, 패스워드 없음 (그냥 엔터)
+mysql>  create  database  gnuboard;               // gnuboard라는 DB를 생성하기
+mysql>  show  databases;                              // 잘 만들어졌는지 확인
+mysql>  create  user  board@localhost  identified by 'cyber12#$';                // 사용자 및 비밀번호 생성
+mysql>  grant  all  privileges  on  gnuboard.*  to  board@localhost;            // board에게 gnuboard의 모든 테이블에 대한 권한부여
+mysql>  exit
+
+3) 웹서버에서 사용할 언어 설치
+$ sudo  apt  install   php   php-mysql   php-common  php-gd  php-fpm   php-xml  php-json  php-curl  git
+
+4) 게시판 소스 다운로드
+$ cd  /var/www/html
+$ sudo  git clone https://github.com/gnuboard/gnuboard5                 // github에 있는 gnuboard를 통째로 복제
+$ cd  gnuboard5
+$ sudo  mkdir  data                                                                   // 사용자들이 업로드할 데이터 디렉토리 생성
+$ sudo  chmod  707   data                                                          // 누구나 읽고 쓰기 가능하도록 설정
+
+5) 마무리
+$ sudo  apt  install  net-tools
+$ ifconfig                                         // ip주소 확인(복사)
+$ sudo  service  apache2  restart
