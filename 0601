@@ -34,3 +34,12 @@ $ sudo  service  apache2  restart
 
 
 6) 설치가 다됐다면 ip주소/gnuborad5로 접속
+
+
+
+7) 귀찬ㄶ게 gnuboard5안 붙이고 접속하기 
+https://github.com/tead1234/Linux-study/assets/35370337/25ef17cb-be88-4634-a9f9-b2479456b3e1
+
+1. cd /etc/apache2/sites-available/
+2 . sudo vi 000-default.conf
+3. DocumentRoot /var/www/html/gnuboard5로 수정
