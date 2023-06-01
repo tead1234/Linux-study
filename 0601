@@ -31,3 +31,6 @@ $ sudo  chmod  707   data                                                       
 $ sudo  apt  install  net-tools
 $ ifconfig                                         // ip주소 확인(복사)
 $ sudo  service  apache2  restart
+
+
+6) 설치가 다됐다면 ip주소/gnuborad5로 접속
